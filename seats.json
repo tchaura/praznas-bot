@@ -1,0 +1,287 @@
+{
+    "sections": [
+        {
+            "section": 1,
+            "rows": [
+                {
+                    "row": 1,
+                    "seats": [
+                        {"seat": 1, "taken": false},
+                        {"seat": 2, "taken": false},
+                        {"seat": 3, "taken": false},
+                        {"seat": 4, "taken": false},
+                        {"seat": 5, "taken": false},
+                        {"seat": 6, "taken": false}
+                    ]
+                },
+                {
+                    "row": 2,
+                    "seats": [
+                        {"seat": 1, "taken": false},
+                        {"seat": 2, "taken": false},
+                        {"seat": 3, "taken": false},
+                        {"seat": 4, "taken": false},
+                        {"seat": 5, "taken": false},
+                        {"seat": 6, "taken": false}
+                    ]
+                },
+                {
+                    "row": 3,
+                    "seats": [
+                        {"seat": 1, "taken": false},
+                        {"seat": 2, "taken": false},
+                        {"seat": 3, "taken": false},
+                        {"seat": 4, "taken": false},
+                        {"seat": 5, "taken": false},
+                        {"seat": 6, "taken": false}
+                    ]
+                },
+                {
+                    "row": 4,
+                    "seats": [
+                        {"seat": 1, "taken": false},
+                        {"seat": 2, "taken": false},
+                        {"seat": 3, "taken": false},
+                        {"seat": 4, "taken": false},
+                        {"seat": 5, "taken": false},
+                        {"seat": 6, "taken": false}
+                    ]
+                },
+                {
+                    "row": 5,
+                    "seats": [
+                        {"seat": 1, "taken": false},
+                        {"seat": 2, "taken": false},
+                        {"seat": 3, "taken": false},
+                        {"seat": 4, "taken": false},
+                        {"seat": 5, "taken": false},
+                        {"seat": 6, "taken": false}
+                    ]
+                },
+                {
+                    "row": 6,
+                    "seats": [
+                        {"seat": 1, "taken": false},
+                        {"seat": 2, "taken": false},
+                        {"seat": 3, "taken": false},
+                        {"seat": 4, "taken": false},
+                        {"seat": 5, "taken": false},
+                        {"seat": 6, "taken": false}
+                    ]
+                },
+                {
+                    "row": 7,
+                    "seats": [
+                        {"seat": 1, "taken": false},
+                        {"seat": 2, "taken": false},
+                        {"seat": 3, "taken": false},
+                        {"seat": 4, "taken": false},
+                        {"seat": 5, "taken": false},
+                        {"seat": 6, "taken": false}
+                    ]
+                },
+                {
+                    "row": 8,
+                    "seats": [
+                        {"seat": 1, "taken": false},
+                        {"seat": 2, "taken": false},
+                        {"seat": 3, "taken": false},
+                        {"seat": 4, "taken": false},
+                        {"seat": 5, "taken": false},
+                        {"seat": 6, "taken": false}
+                    ]
+                }
+            ]
+        },
+        {
+            "section": 2,
+            "rows": [
+                {
+                    "row": 1,
+                    "seats": [
+                        {"seat": 1, "taken": false},
+                        {"seat": 2, "taken": false},
+                        {"seat": 3, "taken": false},
+                        {"seat": 4, "taken": false},
+                        {"seat": 5, "taken": false},
+                        {"seat": 6, "taken": false},
+                        {"seat": 7, "taken": true}
+                    ]
+                },
+                {
+                    "row": 2,
+                    "seats": [
+                        {"seat": 1, "taken": false},
+                        {"seat": 2, "taken": false},
+                        {"seat": 3, "taken": false},
+                        {"seat": 4, "taken": false},
+                        {"seat": 5, "taken": false},
+                        {"seat": 6, "taken": false}
+                    ]
+                },
+                {
+                    "row": 3,
+                    "seats": [
+                        {"seat": 1, "taken": false},
+                        {"seat": 2, "taken": false},
+                        {"seat": 3, "taken": false},
+                        {"seat": 4, "taken": false},
+                        {"seat": 5, "taken": false},
+                        {"seat": 6, "taken": false},
+                        {"seat": 7, "taken": false}
+                    ]
+                },
+                {
+                    "row": 4,
+                    "seats": [
+                        {"seat": 1, "taken": false},
+                        {"seat": 2, "taken": false},
+                        {"seat": 3, "taken": false},
+                        {"seat": 4, "taken": false},
+                        {"seat": 5, "taken": false},
+                        {"seat": 6, "taken": false}
+                    ]
+                },
+                {
+                    "row": 5,
+                    "seats": [
+                        {"seat": 1, "taken": false},
+                        {"seat": 2, "taken": false},
+                        {"seat": 3, "taken": false},
+                        {"seat": 4, "taken": false},
+                        {"seat": 5, "taken": false},
+                        {"seat": 6, "taken": false},
+                        {"seat": 7, "taken": false}
+                    ]
+                },
+                {
+                    "row": 6,
+                    "seats": [
+                        {"seat": 1, "taken": false},
+                        {"seat": 2, "taken": false},
+                        {"seat": 3, "taken": false},
+                        {"seat": 4, "taken": false},
+                        {"seat": 5, "taken": false},
+                        {"seat": 6, "taken": false}
+                    ]
+                },
+                {
+                    "row": 7,
+                    "seats": [
+                        {"seat": 1, "taken": false},
+                        {"seat": 2, "taken": false},
+                        {"seat": 3, "taken": false},
+                        {"seat": 4, "taken": false},
+                        {"seat": 5, "taken": false},
+                        {"seat": 6, "taken": false},
+                        {"seat": 7, "taken": false}
+                    ]
+                },
+                {
+                    "row": 8,
+                    "seats": [
+                        {"seat": 1, "taken": false},
+                        {"seat": 2, "taken": false},
+                        {"seat": 3, "taken": false},
+                        {"seat": 4, "taken": false},
+                        {"seat": 5, "taken": false},
+                        {"seat": 6, "taken": false}
+                    ]
+                }
+            ]
+        },
+        {
+            "section": 3,
+            "rows": [
+                {
+                    "row": 1,
+                    "seats": [
+                        {"seat": 1, "taken": false},
+                        {"seat": 2, "taken": false},
+                        {"seat": 3, "taken": false},
+                        {"seat": 4, "taken": false},
+                        {"seat": 5, "taken": false},
+                        {"seat": 6, "taken": false}
+                    ]
+                },
+                {
+                    "row": 2,
+                    "seats": [
+                        {"seat": 1, "taken": false},
+                        {"seat": 2, "taken": false},
+                        {"seat": 3, "taken": false},
+                        {"seat": 4, "taken": false},
+                        {"seat": 5, "taken": false},
+                        {"seat": 6, "taken": false}
+                    ]
+                },
+                {
+                    "row": 3,
+                    "seats": [
+                        {"seat": 1, "taken": false},
+                        {"seat": 2, "taken": false},
+                        {"seat": 3, "taken": false},
+                        {"seat": 4, "taken": false},
+                        {"seat": 5, "taken": false},
+                        {"seat": 6, "taken": false}
+                    ]
+                },
+                {
+                    "row": 4,
+                    "seats": [
+                        {"seat": 1, "taken": false},
+                        {"seat": 2, "taken": false},
+                        {"seat": 3, "taken": false},
+                        {"seat": 4, "taken": false},
+                        {"seat": 5, "taken": false},
+                        {"seat": 6, "taken": false}
+                    ]
+                },
+                {
+                    "row": 5,
+                    "seats": [
+                        {"seat": 1, "taken": false},
+                        {"seat": 2, "taken": false},
+                        {"seat": 3, "taken": false},
+                        {"seat": 4, "taken": false},
+                        {"seat": 5, "taken": false},
+                        {"seat": 6, "taken": false}
+                    ]
+                },
+                {
+                    "row": 6,
+                    "seats": [
+                        {"seat": 1, "taken": false},
+                        {"seat": 2, "taken": false},
+                        {"seat": 3, "taken": false},
+                        {"seat": 4, "taken": false},
+                        {"seat": 5, "taken": false},
+                        {"seat": 6, "taken": false}
+                    ]
+                },
+                {
+                    "row": 7,
+                    "seats": [
+                        {"seat": 1, "taken": false},
+                        {"seat": 2, "taken": false},
+                        {"seat": 3, "taken": false},
+                        {"seat": 4, "taken": false},
+                        {"seat": 5, "taken": false},
+                        {"seat": 6, "taken": false}
+                    ]
+                },
+                {
+                    "row": 8,
+                    "seats": [
+                        {"seat": 1, "taken": false},
+                        {"seat": 2, "taken": false},
+                        {"seat": 3, "taken": false},
+                        {"seat": 4, "taken": false},
+                        {"seat": 5, "taken": false},
+                        {"seat": 6, "taken": false}
+                    ]
+                }
+            ]
+        }
+    ]
+}

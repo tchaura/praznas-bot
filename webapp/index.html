@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Заказ билетов</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="telegram-web-app.js"></script>
+</head>
+<body>
+    <section id="container">
+        <div id="scheme">
+            <div id="seat-map"></div>
+            <div id="scene">Сцена</div>
+        </div>
+    </section>
+
+    <section id="controls">
+    <div id="current-selection">Выберите место</div>
+    <button disabled="true" id="book-button" class="button">Забронировать</button>
+    <button hidden id="close-button" class="button">Закрыть</button>
+    <button hidden id="remove-button" class="button">Отменить бронь</button>
+    </section>
+
+    <script src="script.js"></script>
+</body>
+</html>
