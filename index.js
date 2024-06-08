@@ -30,26 +30,26 @@ const handleSeatSelection = async (query, user) => {
   lines[line][place][date] = false;
 
   await bot.editMessageText(
-    'Дзякуй за ўвагу да нашага праекта 😊\n\n' +
-    `Ваша дата: ${date}\n\n` +
-    `Ваш рад ў зале: ${line + 1}\n\n` +
-    `Ваша месца ў зале: ${place + 1}\n\n` +
-    `Адрас: вул. Першамайская 23 \n\n`,
-    {
-      chat_id: query.message.chat.id,
-      message_id: query.message.message_id,
-    }
+      '<b>Дзякуй за ўвагу да нашага праекта 😊 </b>\n\n' +
+      `🗓️ Ваша дата: ${date}\n\n` +
+      `🔹 Ваш рад ў зале: ${line + 1}\n\n` +
+      `🔹 Ваша месца ў зале: ${place + 1}\n\n` +
+      `♦️ Адрас: <a href="https://yandex.by/maps/-/CDruJ-Mp">вул. Першамайская 23</a>`,
+      {
+        chat_id: query.message.chat.id,
+        message_id: query.message.message_id,
+        reply_markup: {
+          inline_keyboard: [
+            [{text: "🗺️ Як даехаць", callback_data: "how_to_get"}],
+            [{text: "📅 Забраніраваць яшчэ", callback_data: "start"}],
+            [{text: "❌ Адмяніць браніраванне", callback_data: `delete_${user.id}_${date}_${line + 1}_${place + 1}`}]
+          ]
+        },
+        parse_mode: 'HTML'
+      }
   );
 
   await bot.deleteMessage(query.message.chat.id, query.message.message_id - 2);
-
-  await bot.sendMessage(query.message.chat.id, 'Калі жадаеце забраніраваць яшчэ адно месца, напішыце /start\nКалі жадаеце адмяніць браніраванне, напішыце /delete', {
-    reply_markup: {
-      inline_keyboard: [
-        [{ text: "🗺️ Як даехаць", callback_data: "how_to_get" }]
-      ]
-    }
-  });
 
   user.place = place + 1;
 
@@ -57,16 +57,17 @@ const handleSeatSelection = async (query, user) => {
     if (admin.chat_id == 0) {
       continue;
     }
-    await bot.sendMessage(admin.chat_id, "Забронировано место:\n\n" +
-      "Имя - " + query.from.first_name + ', ссылка на профиль - @' + query.from.username + '\n\n' +
-      `Дата - ${date}\n` +
-      `Ряд - ${line + 1}\n` +
-      `Место - ${place + 1}`, {
+    await bot.sendMessage(admin.chat_id, "<b>Забронировано место:</b> \n\n" +
+        "Имя - " + query.from.first_name + ', ссылка на профиль - @' + query.from.username + '\n\n' +
+        `Дата - ${date}\n` +
+        `Ряд - ${line + 1}\n` +
+        `Место - ${place + 1}`, {
       reply_markup: {
         inline_keyboard: [
           [{ text: "Отменить бронирование", callback_data: `admin_delete_${query.from.id}_${date}_${line}_${place}` }]
         ]
-      }
+      },
+      parse_mode: 'HTML'
     });
   }
 
@@ -85,13 +86,13 @@ const handleLineSelection = async (query, user) => {
   kb.push([{ text: "⏪ Да выбару рада", callback_data: 'forward' }]);
 
   await bot.editMessageText(
-    `Калi ласка, абярыце месца ў зале\nВольныя месцы на радзе ${line + 1}:`, {
-      chat_id: query.message.chat.id,
-      message_id: query.message.message_id,
-      reply_markup: {
-        inline_keyboard: kb,
-      },
-    }
+      `Калi ласка, абярыце месца ў зале\nВольныя месцы на радзе ${line + 1}:`, {
+        chat_id: query.message.chat.id,
+        message_id: query.message.message_id,
+        reply_markup: {
+          inline_keyboard: kb,
+        },
+      }
   );
 
   user.line = line + 1;
@@ -111,79 +112,86 @@ const handleDateSelection = async (query, user) => {
 
   await bot.sendPhoto(query.message.chat.id, "./scheme.png");
   await bot.sendMessage(
-    query.message.chat.id,
-    "Калi ласка, абярыце месца ў зале\nВольныя рады:", {
-      reply_markup: {
-        inline_keyboard: kb,
-      },
-    }
+      query.message.chat.id,
+      "Калi ласка, абярыце месца ў зале\nВольныя рады:", {
+        reply_markup: {
+          inline_keyboard: kb,
+        },
+      }
   );
 
   saveData();
 };
 
-// Command to delete booking
-bot.onText(/\/delete/, async (msg) => {
+const startConversation = async function (msg) {
   const chatId = msg.chat.id;
-  const userId = msg.from.id;
-  const user = users.find(user => user.id === userId && user.date && user.line && user.place);
 
-  if (user) {
-    const { date, line, place } = user;
-    await bot.sendMessage(chatId, `Вы ўпэўнены, што жадаеце адмяніць браніраванне на ${place} месца ў ${line} радзе на ${date}?`, {
+  if (admins.some(admin => admin.username == msg.chat.username)) {
+    admins.filter(admin => admin.username == msg.chat.username)[0].chat_id = chatId;
+    console.log(msg.chat.username)
+  }
+
+  await bot.sendPhoto(chatId, "./poster.png", {
+    caption: `<b>Вітаем вас на рэгістрацыі да спектакля "Дадому"! </b> \n
+🎭 Імерсіўнае хрысціянскае прадстаўленне "Дадому" - гэта гісторыя, якая распавядае гледачу пра страчаны дом і доўгі шлях, які прайшло чалавецтва, каб зноў мець магчымасць апынуцца дома. \n
+
+У гэтым спектаклі вы пазнаёміцеся з гісторыямі знакамітых людзей, з якімі Бог заключыў запавет. Людзей, якія паверылі Яго абяцанню. \n
+Што здарылася з тымі героямі? Ці страцілі мы свой сапраўдны дом, і ці ёсці у нас магчымасць зноў апынуцца там?
+Даведаецеся ў нас на спектаклі!
+
+<i>📌 Уваход - любая купюра. </i>`,
+    parse_mode: "HTML"
+  });
+
+  await bot.sendMessage(chatId, `Калi ласка, абярыце час спектакля:`, {
+    reply_markup: {
+      inline_keyboard: [
+        [{ text: "1️⃣ 13 чэрвеня, 20:00", callback_data: "select1" }],
+        [{ text: "2️⃣ 15 чэрвеня, 16:30", callback_data: "select2" }]
+      ],
+    },
+  });
+
+  users.push({
+    id: chatId,
+    date: '',
+    line: 0,
+    place: 0,
+  });
+
+  saveData();
+}
+
+const deleteBooking = async function(chatId, queryData) {
+  const [_, userId, date, realLine, realPlace] = queryData.split('_');
+
+  const booking = users.find(user => user.id == userId && user.date == date && user.line == realLine && user.place == realPlace);
+
+  if (booking) {
+    await bot.sendMessage(chatId, `Вы ўпэўнены, што жадаеце адмяніць браніраванне на ${realPlace} месца ў ${realLine} радзе на ${date}?`, {
       reply_markup: {
         inline_keyboard: [
-          [{ text: "Так", callback_data: `confirm_delete_${userId}` }],
-          [{ text: "Не", callback_data: "cancel_delete" }]
+          [{ text: "✅ Так", callback_data: `confirm_delete_${userId}_${date}_${realLine}_${realPlace}` }],
+          [{ text: "❌ Не", callback_data: "cancel_delete" }]
         ]
       }
     });
   } else {
-    await bot.sendMessage(chatId, "Вы не маеце актыўных браніраванняў.");
+    await bot.sendMessage(chatId, "Гэта браніраванне ўжо адменена.");
   }
+}
+
+// Command to start booking
+bot.onText(/\/start/, async (msg) => {
+  await startConversation(msg);
 });
 
 // Message handler
 bot.on("message", async (msg) => {
 
-  if (admins.some(admin => admin.username == msg.from.username)) {
-    admins.filter(admin => admin.username == msg.from.username)[0].chat_id = msg.chat.id;
-    console.log(msg.from.username)
-  }
-  if (msg.text === '/delete') return;  // Skip if the message is the delete command
+  if (msg.text === '/delete' || msg.text === '/start') return;  // Skip if the message is the delete or start command
 
   try {
-    const chatId = msg.chat.id;
-
-    await bot.sendPhoto(chatId, "./poster.png", {
-      caption: `Вітаем вас на рэгістрацыі да спектакля "Дадому"!\n
-🎭 Імерсіўнае хрысціянскае прадстаўленне "Дадому" - гэта гісторыя, якая распавядае гледачу пра страчаны дом і доўгі шлях, які прайшло чалавецтва, каб зноў мець магчымасць апынуцца дома. \n
-
-У гэтым спектаклі вы пазнаёміцеся з гісторыямі знакамітых людзей, з якімі Бог заключыў запавет. Людзей, якія паверылі Яго абяцанню. \n
-
-Што здарылася з тымі героямі? Ці страцілі мы свой сапраўдны дом, і ці ёсці у нас магчымасць зноў апынуцца там?\n
-Даведаецеся ў нас на спектаклі!
-
-📌 Уваход - любая купюра.`
-    });
-
-    await bot.sendMessage(chatId, `Калi ласка, абярыце час спектакля:`, {
-      reply_markup: {
-        inline_keyboard: [
-          [{ text: "13 чэрвеня, 20:00", callback_data: "select1" }],
-          [{ text: "15 чэрвеня, 16:30", callback_data: "select2" }]
-        ],
-      },
-    });
-
-    users.push({
-      id: msg.from.id,
-      date: '',
-      line: 0,
-      place: 0,
-    });
-
-    saveData();
   } catch (err) {
     console.log(err.message);
   }
@@ -194,7 +202,7 @@ bot.on("callback_query", async (query) => {
   try {
     await bot.answerCallbackQuery({ callback_query_id: query.id });
 
-    const user = users.find(user => user.id === query.from.id && !user.place);
+    const user = users.find(user => user.id == query.from.id && !user.place);
 
     if (query.data.includes("select")) {
       await handleDateSelection(query, user);
@@ -205,18 +213,17 @@ bot.on("callback_query", async (query) => {
     } else if (query.data === 'forward') {
       await handleDateSelection(query, user);
     } else if (query.data.includes('confirm_delete')) {
-      const userId = Number(query.data.split('_')[2]);
-      const userIndex = users.findIndex(user => user.id === userId);
+      const [userId, date, line, place] = query.data.replace('confirm_delete_', '').split('_');
+      const userIndex = users.findIndex(user => user.id == userId && user.date == date && user.line == line && user.place == place);
       const user = users[userIndex];
 
       if (user) {
-        const { date, line, place } = user;
         lines[line - 1][place - 1][date] = true;
         users.splice(userIndex, 1);
         const remainingBookings = users.filter(curUser => curUser.id == user.id && curUser.date).length;
 
         await bot.sendMessage(query.message.chat.id, `Ваша браніраванне на месца ${place} рада ${line} на ${date} было адменена.\n
-          ${remainingBookings != 0 ? "❗️ У вас яшчэ засталося " + remainingBookings + " актыўных браніраванняў." : ""}`);
+${remainingBookings != 0 ? "❗️ У вас яшчэ засталося " + remainingBookings + " актыўных браніраванняў." : ""}`);
       } else {
         await bot.sendMessage(query.message.chat.id, "Не ўдалося знайсці браніраванне для адмены.");
       }
@@ -249,17 +256,27 @@ bot.on("callback_query", async (query) => {
     } else if (query.data === 'cancel_delete') {
       await bot.sendMessage(query.message.chat.id, "Адменена.");
     } else if (query.data === "how_to_get") {
-      await bot.sendMessage(query.message.chat.id, `🗺️ Як даехаць:\n
+      await bot.sendMessage(query.message.chat.id, `<b>Як даехаць: </b>\n
+♦️<a href="https://yandex.by/maps/-/CDruJ-Mp">Паглядзець ў Яндекс Картах</a>
+
 🚌 Аўтобусы\n
-  - ад вакзала аўтобусам 115э, праз Як. Коласа, Валгаградскую (Маскоўскую).\n
-  - з Валгаградскай (м. Маскоўская) аўтобусы 113с, 145с, 115э.\n
+<i>- ад вакзала аўтобусам 115э, праз Як. Коласа, Валгаградскую (Маскоўскую). </i>\n
+<i>- з Валгаградскай (м. Маскоўская) аўтобусы 113с, 145с, 115э.</i> \n
 🚍 Яшчэ ёсць маршруткі 1151,1455,1554,1409\n
-Выходзіць на прыпынку "Раённая бальніца" і ісці наперад 200м.\n`);
+<b>Выходзіць на прыпынку "Раённая бальніца" і ісці наперад 200м. </b>\n`,
+          {
+            parse_mode: "HTML"
+          });
       await bot.sendVideo(query.message.chat.id, "./guide.mp4", {
         caption: "🔹 Як дайсцi ад астаноўкі",
         width: 704,
         height: 1280
       });
+    } else if (query.data === 'start') {
+      await startConversation(query.message);
+    } else if (query.data.includes('delete')) {
+      const chatId = query.message.chat.id;
+      await deleteBooking(chatId, query.data);
     }
   } catch (err) {
     console.log(err);
@@ -276,12 +293,12 @@ cron.schedule('0 8 * * *', () => {
   users.forEach(user => {
     if (user.date.startsWith(formattedTomorrow)) {
       bot.sendMessage(user.id, `Нагадваем, што заўтра ў вас браніраванне:\n\n` +
-        `Дата: ${user.date}\n` +
-        `Рад: ${user.line}\n` +
-        `Месца: ${user.place}\n` +
-        `Адрас: вул. Першамайская 23\n\n` +
-        `Калі ласка, не забудзьцеся з'явіцца!\n` +
-      `Вы таксама можаце адмяніць браніраванне камандай /delete`);
+          `Дата: ${user.date}\n` +
+          `Рад: ${user.line}\n` +
+          `Месца: ${user.place}\n` +
+          `Адрас: вул. Першамайская 23\n\n` +
+          `Калі ласка, не забудзьцеся з'явіцца!\n` +
+          `Вы таксама можаце адмяніць браніраванне камандай /delete`);
     }
   });
 });
