@@ -6,6 +6,11 @@ const cron = require("node-cron");
 const users = require("./db/users.json");
 const lines = require('./db/places.json');
 
+const admins = [
+  { username: "tim_chaura", chat_id: 0 },
+  { username: "NastyaGaevska", chat_id: 0 }
+]
+
 const bot = new TelegramBot(token, { polling: true });
 
 // Helper function to save data to JSON files
@@ -33,18 +38,35 @@ const handleSeatSelection = async (query, user) => {
       message_id: query.message.message_id,
     }
   );
-  
+
   await bot.deleteMessage(query.message.chat.id, query.message.message_id - 2);
 
-  await bot.sendMessage(query.message.chat.id, 'Калі жадаеце забраніраваць яшчэ адно месца, напішыце /start\nКалі жадаеце адмяніць браніраванне, напішыце /delete');
-  await bot.sendVideo(query.message.chat.id, "./guide.mp4", {
-    caption: "🔹 Як да нас дабрацца",
-    width: 704,
-    height: 1280
-  }
-);
+  await bot.sendMessage(query.message.chat.id, 'Калі жадаеце забраніраваць яшчэ адно месца, напішыце /start\nКалі жадаеце адмяніць браніраванне, напішыце /delete', {
+    reply_markup: {
+      inline_keyboard: [
+        [{ text: "🗺️ Як даехаць", callback_data: "how_to_get" }]
+      ]
+    }
+  });
 
   user.place = place + 1;
+
+  for (const admin of admins) {
+    if (admin.chat_id == 0) {
+      continue;
+    }
+    await bot.sendMessage(admin.chat_id, "Забронировано место:\n\n" +
+      "Имя - " + query.from.first_name + ', ссылка на профиль - @' + query.from.username + '\n\n' +
+      `Дата - ${date}\n` +
+      `Ряд - ${line + 1}\n` +
+      `Место - ${place + 1}`, {
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: "Отменить бронирование", callback_data: `admin_delete_${query.from.id}_${date}_${line}_${place}` }]
+        ]
+      }
+    });
+  }
 
   saveData();
 };
@@ -121,13 +143,26 @@ bot.onText(/\/delete/, async (msg) => {
 
 // Message handler
 bot.on("message", async (msg) => {
+
+  if (admins.some(admin => admin.username == msg.from.username)) {
+    admins.filter(admin => admin.username == msg.from.username)[0].chat_id = msg.chat.id;
+    console.log(msg.from.username)
+  }
   if (msg.text === '/delete') return;  // Skip if the message is the delete command
 
   try {
     const chatId = msg.chat.id;
 
     await bot.sendPhoto(chatId, "./poster.png", {
-      caption: 'Вітаем вас на рэгістрацыі да спектакля "Дадому"!'
+      caption: `Вітаем вас на рэгістрацыі да спектакля "Дадому"!\n
+🎭 Імерсіўнае хрысціянскае прадстаўленне "Дадому" - гэта гісторыя, якая распавядае гледачу пра страчаны дом і доўгі шлях, які прайшло чалавецтва, каб зноў мець магчымасць апынуцца дома. \n
+
+У гэтым спектаклі вы пазнаёміцеся з гісторыямі знакамітых людзей, з якімі Бог заключыў запавет. Людзей, якія паверылі Яго абяцанню. \n
+
+Што здарылася з тымі героямі? Ці страцілі мы свой сапраўдны дом, і ці ёсці у нас магчымасць зноў апынуцца там?\n
+Даведаецеся ў нас на спектаклі!
+
+📌 Уваход - любая купюра.`
     });
 
     await bot.sendMessage(chatId, `Калi ласка, абярыце час спектакля:`, {
@@ -176,7 +211,7 @@ bot.on("callback_query", async (query) => {
         const { date, line, place } = user;
         lines[line - 1][place - 1][date] = true;
         users.splice(userIndex, 1);
-        const remainingBookings =  users.filter(user => user.date != "").length;
+        const remainingBookings = users.filter(curUser => curUser.id == user.id && curUser.date == "").length;
 
         await bot.sendMessage(query.message.chat.id, `Ваша браніраванне на месца ${place} рада ${line} на ${date} было адменена.\n
           ${remainingBookings != 0 ? "❗️ У вас яшчэ засталося " + remainingBookings + " актыўных браніраванняў." : ""}`);
@@ -185,8 +220,44 @@ bot.on("callback_query", async (query) => {
       }
 
       saveData();
+    } else if (query.data.includes('admin_delete')) {
+      const queryToParse = query.data.replace('admin_delete', '');
+      let [_, userId, date, line, place] = queryToParse.split('_');
+      line = Number.parseInt(line) + 1;
+      place = Number.parseInt(place) + 1;
+      const userIndex = users.findIndex(user => user.id == userId && user.date == date && user.line == line && user.place == place);
+
+      if (userIndex >= 0) {
+        users.splice(userIndex, 1);
+        lines[line - 1][place - 1][date] = true;
+
+        await bot.sendMessage(query.message.chat.id, `Бронь на месца ${place} рада ${line} на ${date} была адменена адміністратарам.`);
+        const remainingBookings = users.filter(user => user.id == userId && user.date).length;
+
+        if (remainingBookings > 0) {
+          await bot.sendMessage(userId, `Адміністратар адмяніў вашу бронь на месца ${place} рада ${line} на ${date}. Звярніце ўвагу, што ў вас засталося  ${remainingBookings} актыўных браніроўкі(аў).`);
+        } else {
+          await bot.sendMessage(userId, `Адміністратар адмяніў вашу бронь на месца ${place} рада ${line} на ${date}.`);
+        }
+
+        saveData();
+      } else {
+        await bot.sendMessage(query.message.chat.id, "Не ўдалося знайсці браніроўку для адмены.");
+      }
     } else if (query.data === 'cancel_delete') {
       await bot.sendMessage(query.message.chat.id, "Адменена.");
+    } else if (query.data === "how_to_get") {
+      await bot.sendMessage(query.message.chat.id, `🗺️ Як даехаць:\n
+🚌 Аўтобусы\n
+  - ад вакзала аўтобусам 115э, праз Як. Коласа, Валгаградскую (Маскоўскую).\n
+  - з Валгаградскай (м. Маскоўская) аўтобусы 113с, 145с, 115э.\n
+🚍 Яшчэ ёсць маршруткі 1151,1455,1554,1409\n
+Выходзіць на прыпынку "Раённая бальніца" і ісці наперад 200м.\n`);
+      await bot.sendVideo(query.message.chat.id, "./guide.mp4", {
+        caption: "🔹 Як дайсцi ад астаноўкі",
+        width: 704,
+        height: 1280
+      });
     }
   } catch (err) {
     console.log(err);
