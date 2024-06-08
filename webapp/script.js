@@ -15,7 +15,7 @@
     return first.section == second.section && first.row == second.row && first.seat == second.seat 
 }
 async function generateSeatMap() {
-    const seatingData = await (await fetch("/seats.json")).json();
+    const seatingData = await (await fetch("seats.json")).json();
     seatingData.sections.forEach((section, sectionIndex) => {
         const sectionDiv = document.createElement('div');
         sectionDiv.className = 'section';

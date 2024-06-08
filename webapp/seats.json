@@ -105,7 +105,7 @@
                         {"seat": 4, "taken": false},
                         {"seat": 5, "taken": false},
                         {"seat": 6, "taken": false},
-                        {"seat": 7, "taken": true}
+                        {"seat": 7, "taken": false}
                     ]
                 },
                 {
