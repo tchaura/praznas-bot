@@ -32,7 +32,7 @@ const handleSeatSelection = async (query, user) => {
   await bot.editMessageText(
     'Дзякуй за ўвагу да нашага праекта 😊\n\n' +
     `Ваша дата: ${date}\n\n` +
-    `Ваша рад ў зале: ${line + 1}\n\n` +
+    `Ваш рад ў зале: ${line + 1}\n\n` +
     `Ваша месца ў зале: ${place + 1}\n\n` +
     `Адрас: вул. Першамайская 23 \n\n`,
     {
@@ -213,7 +213,7 @@ bot.on("callback_query", async (query) => {
         const { date, line, place } = user;
         lines[line - 1][place - 1][date] = true;
         users.splice(userIndex, 1);
-        const remainingBookings = users.filter(curUser => curUser.id == user.id && curUser.date == "").length;
+        const remainingBookings = users.filter(curUser => curUser.id == user.id && curUser.date).length;
 
         await bot.sendMessage(query.message.chat.id, `Ваша браніраванне на месца ${place} рада ${line} на ${date} было адменена.\n
           ${remainingBookings != 0 ? "❗️ У вас яшчэ засталося " + remainingBookings + " актыўных браніраванняў." : ""}`);
