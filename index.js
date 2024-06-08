@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const token = "7463829875:AAGAb9z3Nf2jLMfVDj7T4fAxPis5O5ws_A4";
 const TelegramBot = require("node-telegram-bot-api");
 const fs = require("fs");
