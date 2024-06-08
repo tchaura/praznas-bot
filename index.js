@@ -34,7 +34,7 @@ const handleSeatSelection = async (query, user) => {
       `🗓️ Ваша дата: ${date}\n\n` +
       `🔹 Ваш рад ў зале: ${line + 1}\n\n` +
       `🔹 Ваша месца ў зале: ${place + 1}\n\n` +
-      `♦️ Адрас: <a href="https://yandex.by/maps/-/CDruJ-Mp">вул. Першамайская 23</a>`,
+      `♦️ Адрас: вул. Першамайская 23`,
       {
         chat_id: query.message.chat.id,
         message_id: query.message.message_id,
@@ -52,6 +52,8 @@ const handleSeatSelection = async (query, user) => {
   await bot.deleteMessage(query.message.chat.id, query.message.message_id - 2);
 
   user.place = place + 1;
+
+  console.log(`New booking: ${user.id}, date ${date}, line ${user.line} place ${user.place}`);
 
   for (const admin of admins) {
     if (admin.chat_id == 0) {
@@ -228,6 +230,7 @@ ${remainingBookings != 0 ? "❗️ У вас яшчэ засталося " + rem
         await bot.sendMessage(query.message.chat.id, "Не ўдалося знайсці браніраванне для адмены.");
       }
 
+      console.log(`Booking deleted: ${userId}, date ${date}, line ${line} place ${place}`);
       saveData();
     } else if (query.data.includes('admin_delete')) {
       const queryToParse = query.data.replace('admin_delete', '');
