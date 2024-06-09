@@ -23,17 +23,16 @@ const saveData = () => {
 
 // Function to handle seat selection
 const handleSeatSelection = async (query, user) => {
-  const place = Number(query.data.split('_')[1]) - 1;
-  const line = user.line - 1;
+  const [_, line, place] = query.data.split('_');
   const date = user.date;
 
-  lines[line][place][date] = false;
+  lines[line - 1][place - 1][date] = false;
 
   await bot.editMessageText(
       '<b>Дзякуй за ўвагу да нашага праекта 😊 </b>\n\n' +
       `🗓️ Ваша дата: ${date}\n\n` +
-      `🔹 Ваш рад ў зале: ${line + 1}\n\n` +
-      `🔹 Ваша месца ў зале: ${place + 1}\n\n` +
+      `🔹 Ваш рад ў зале: ${line}\n\n` +
+      `🔹 Ваша месца ў зале: ${place}\n\n` +
       `♦️ Адрас: вул. Першамайская 23`,
       {
         chat_id: query.message.chat.id,
@@ -42,16 +41,15 @@ const handleSeatSelection = async (query, user) => {
           inline_keyboard: [
             [{text: "🗺️ Як даехаць", callback_data: "how_to_get"}],
             [{text: "📅 Забраніраваць яшчэ", callback_data: "start"}],
-            [{text: "❌ Адмяніць браніраванне", callback_data: `delete_${user.id}_${date}_${line + 1}_${place + 1}`}]
+            [{text: "❌ Адмяніць браніраванне", callback_data: `delete_${user.id}_${date}_${line}_${place}`}]
           ]
         },
         parse_mode: 'HTML'
       }
   );
 
-  await bot.deleteMessage(query.message.chat.id, query.message.message_id - 2);
-
-  user.place = place + 1;
+  user.line = Number.parseInt(line);
+  user.place = Number.parseInt(place);
 
   console.log(`New booking: ${user.id}, date ${date}, line ${user.line} place ${user.place}`);
 
@@ -62,8 +60,8 @@ const handleSeatSelection = async (query, user) => {
     await bot.sendMessage(admin.chat_id, "<b>Забронировано место:</b> \n\n" +
         "Имя - " + query.from.first_name + ', ссылка на профиль - @' + query.from.username + '\n\n' +
         `Дата - ${date}\n` +
-        `Ряд - ${line + 1}\n` +
-        `Место - ${place + 1}`, {
+        `Ряд - ${line}\n` +
+        `Место - ${place}`, {
       reply_markup: {
         inline_keyboard: [
           [{ text: "Отменить бронирование", callback_data: `admin_delete_${query.from.id}_${date}_${line}_${place}` }]
@@ -81,7 +79,7 @@ const handleLineSelection = async (query, user) => {
   const line = Number(query.data.split('_')[1]) - 1;
   const kb = lines[line].map((place, i) => {
     if (place[user.date]) {
-      return [{ text: `Месца ${i + 1}`, callback_data: "place_" + (i + 1) }];
+      return [{ text: `Месца ${i + 1}`, callback_data: `place_${line + 1}_${(i + 1)}`}];
     }
   }).filter(place => place);
 
@@ -96,21 +94,30 @@ const handleLineSelection = async (query, user) => {
         },
       }
   );
-
-  user.line = line + 1;
-  saveData();
+  //
+  // user.line = line + 1;
+  // saveData();
 };
 
 // Function to handle date selection
 const handleDateSelection = async (query, user) => {
-  const date = query.data === 'select1' ? '13.06.2024, 20:00' : '15.06.2024, 16:30';
-  user.date = date;
+  let date;
+  if (query.data.includes('select')) {
+    date = query.data === 'select1' ? '13.06.2024, 20:00' : '15.06.2024, 16:30';
+    user.date = date;
+  }
+  else {
+    date = user.date;
+  }
 
   const kb = lines.map((line, i) => {
     if (line.some(place => place[date])) {
       return [{ text: `Рад ${i + 1}`, callback_data: "line_" + (i + 1) }];
     }
   }).filter(line => line);
+
+  kb.push([{ text: "⏪Вярнуцца", callback_data: 'clean_start' }]);
+
 
   await bot.sendPhoto(query.message.chat.id, "./scheme.png");
   await bot.sendMessage(
@@ -125,17 +132,18 @@ const handleDateSelection = async (query, user) => {
   saveData();
 };
 
-const startConversation = async function (msg) {
+const startConversation = async function (msg, clean_start) {
   const chatId = msg.chat.id;
 
   if (admins.some(admin => admin.username == msg.chat.username)) {
     admins.filter(admin => admin.username == msg.chat.username)[0].chat_id = chatId;
-    console.log(msg.chat.username)
+    // console.log(msg.chat.username)
   }
 
+  if (!clean_start) {
   await bot.sendPhoto(chatId, "./poster.png", {
     caption: `<b>Вітаем вас на рэгістрацыі да спектакля "Дадому"! </b> \n
-🎭 Імерсіўнае хрысціянскае прадстаўленне "Дадому" - гэта гісторыя, якая распавядае гледачу пра страчаны дом і доўгі шлях, які прайшло чалавецтва, каб зноў мець магчымасць апынуцца дома. \n
+🎭 Імерсіўнае хрысціянскае прадстаўленне "Дадому" - гэта гісторыя, якая распавядае гледачу пра страчаны дом і доўгі шлях, які прайшло чалавецтва, каб зноў мець магчымасць апынуцца дома.
 
 У гэтым спектаклі вы пазнаёміцеся з гісторыямі знакамітых людзей, з якімі Бог заключыў запавет. Людзей, якія паверылі Яго абяцанню. \n
 Што здарылася з тымі героямі? Ці страцілі мы свой сапраўдны дом, і ці ёсці у нас магчымасць зноў апынуцца там?
@@ -144,6 +152,14 @@ const startConversation = async function (msg) {
 <i>📌 Уваход - любая купюра. </i>`,
     parse_mode: "HTML"
   });
+
+    users.push({
+      id: chatId,
+      date: '',
+      line: 0,
+      place: 0,
+    });
+  }
 
   await bot.sendMessage(chatId, `Калi ласка, абярыце час спектакля:`, {
     reply_markup: {
@@ -154,12 +170,7 @@ const startConversation = async function (msg) {
     },
   });
 
-  users.push({
-    id: chatId,
-    date: '',
-    line: 0,
-    place: 0,
-  });
+
 
   saveData();
 }
@@ -207,12 +218,15 @@ bot.on("callback_query", async (query) => {
     const user = users.find(user => user.id == query.from.id && !user.place);
 
     if (query.data.includes("select")) {
+      await bot.deleteMessage(query.message.chat.id, query.message.message_id);
       await handleDateSelection(query, user);
     } else if (query.data.includes('line')) {
       await handleLineSelection(query, user);
     } else if (query.data.includes('place')) {
       await handleSeatSelection(query, user);
     } else if (query.data === 'forward') {
+      await bot.deleteMessage(query.message.chat.id, query.message.message_id);
+      await bot.deleteMessage(query.message.chat.id, query.message.message_id - 1);
       await handleDateSelection(query, user);
     } else if (query.data.includes('confirm_delete')) {
       const [userId, date, line, place] = query.data.replace('confirm_delete_', '').split('_');
@@ -225,7 +239,7 @@ bot.on("callback_query", async (query) => {
         const remainingBookings = users.filter(curUser => curUser.id == user.id && curUser.date).length;
 
         await bot.sendMessage(query.message.chat.id, `Ваша браніраванне на месца ${place} рада ${line} на ${date} было адменена.\n
-${remainingBookings != 0 ? "❗️ У вас яшчэ засталося " + remainingBookings + " актыўных браніраванняў." : ""}`);
+${remainingBookings != 0 ? "❗️ У вас засталося актыўных браніраванняў: " + remainingBookings : ""}`);
       } else {
         await bot.sendMessage(query.message.chat.id, "Не ўдалося знайсці браніраванне для адмены.");
       }
@@ -235,8 +249,8 @@ ${remainingBookings != 0 ? "❗️ У вас яшчэ засталося " + rem
     } else if (query.data.includes('admin_delete')) {
       const queryToParse = query.data.replace('admin_delete', '');
       let [_, userId, date, line, place] = queryToParse.split('_');
-      line = Number.parseInt(line) + 1;
-      place = Number.parseInt(place) + 1;
+      line = Number.parseInt(line);
+      place = Number.parseInt(place);
       const userIndex = users.findIndex(user => user.id == userId && user.date == date && user.line == line && user.place == place);
 
       if (userIndex >= 0) {
@@ -254,13 +268,12 @@ ${remainingBookings != 0 ? "❗️ У вас яшчэ засталося " + rem
 
         saveData();
       } else {
-        await bot.sendMessage(query.message.chat.id, "Не ўдалося знайсці браніроўку для адмены.");
+        await bot.sendMessage(query.message.chat.id, "Не атрымалася знайсці браніроўку для адмены.");
       }
     } else if (query.data === 'cancel_delete') {
-      await bot.sendMessage(query.message.chat.id, "Адменена.");
+      await bot.sendMessage(query.message.chat.id, "Добра. Месца не адменена.");
     } else if (query.data === "how_to_get") {
       await bot.sendMessage(query.message.chat.id, `<b>Як даехаць: </b>\n
-♦️<a href="https://yandex.by/maps/-/CDruJ-Mp">Паглядзець ў Яндекс Картах</a>
 
 🚌 Аўтобусы\n
 <i>- ад вакзала аўтобусам 115э, праз Як. Коласа, Валгаградскую (Маскоўскую). </i>\n
@@ -275,6 +288,10 @@ ${remainingBookings != 0 ? "❗️ У вас яшчэ засталося " + rem
         width: 704,
         height: 1280
       });
+    } else if (query.data === 'clean_start') {
+      await bot.deleteMessage(query.message.chat.id, query.message.message_id);
+      await bot.deleteMessage(query.message.chat.id, query.message.message_id - 1);
+      await startConversation(query.message, true);
     } else if (query.data === 'start') {
       await startConversation(query.message);
     } else if (query.data.includes('delete')) {
