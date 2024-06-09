@@ -284,7 +284,7 @@ ${remainingBookings != 0 ? "❗️ У вас засталося актыўных
             parse_mode: "HTML"
           });
       await bot.sendVideo(query.message.chat.id, "./guide.mp4", {
-        caption: "🔹 Як дайсцi ад астаноўкі",
+        caption: "🔹 Як дайсцi ад прыпынку",
         width: 704,
         height: 1280
       });
