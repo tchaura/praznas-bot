@@ -240,6 +240,19 @@ bot.on("callback_query", async (query) => {
 
         await bot.sendMessage(query.message.chat.id, `Ваша браніраванне на месца ${place} рада ${line} на ${date} было адменена.\n
 ${remainingBookings != 0 ? "❗️ У вас засталося актыўных браніраванняў: " + remainingBookings : ""}`);
+
+        for (const admin of admins) {
+          if (admin.chat_id == 0) {
+            continue;
+          }
+          await bot.sendMessage(admin.chat_id, "<b>Отменено бронирование</b> \n\n" +
+              "Имя - " + query.from.first_name + ', ссылка на профиль - @' + query.from.username + '\n\n' +
+              `Дата - ${date}\n` +
+              `Ряд - ${line}\n` +
+              `Место - ${place}`, {
+            parse_mode: 'HTML'
+          });
+        }
       } else {
         await bot.sendMessage(query.message.chat.id, "Не ўдалося знайсці браніраванне для адмены.");
       }
