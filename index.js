@@ -9,7 +9,7 @@ const users = require("./db/users.json");
 const lines = require('./db/places.json');
 
 const admins = [
-  { username: "tim_chaura", chat_id: 0 },
+  { username: "tim_chaura", chat_id: 307963993 },
   { username: "NastyaGaevska", chat_id: 0 }
 ]
 
@@ -273,7 +273,7 @@ ${remainingBookings != 0 ? "❗️ У вас засталося актыўных
     } else if (query.data === 'cancel_delete') {
       await bot.sendMessage(query.message.chat.id, "Добра. Месца не адменена.");
     } else if (query.data === "how_to_get") {
-      await bot.sendMessage(query.message.chat.id, `<b>Як даехаць: </b>\n
+      await bot.sendMessage(query.message.chat.id, `<b>Як даехаць: </b>
 
 🚌 Аўтобусы\n
 <i>- ад вакзала аўтобусам 115э, праз Як. Коласа, Валгаградскую (Маскоўскую). </i>\n
@@ -283,7 +283,7 @@ ${remainingBookings != 0 ? "❗️ У вас засталося актыўных
           {
             parse_mode: "HTML"
           });
-      await bot.sendVideo(query.message.chat.id, "./guide.mp4", {
+      await bot.sendVideo(query.message.chat.id, "./guide1.mp4", {
         caption: "🔹 Як дайсцi ад прыпынку",
         width: 704,
         height: 1280
@@ -317,8 +317,8 @@ cron.schedule('0 8 * * *', () => {
           `Рад: ${user.line}\n` +
           `Месца: ${user.place}\n` +
           `Адрас: вул. Першамайская 23\n\n` +
-          `Калі ласка, не забудзьцеся з'явіцца!\n` +
-          `Вы таксама можаце адмяніць браніраванне камандай /delete`);
+          `Калі ласка, не забудзьцеся прыйсці!\n` +
+          `Вы таксама можаце адмяніць браніраванне`);
     }
   });
 });
