@@ -101,17 +101,51 @@ const handleLineSelection = async (query, user) => {
 
 // Function to handle date selection
 const handleDateSelection = async (query, user) => {
-  let date;
+  let selectedDateString;
+
+  const today = new Date();
+
+
   if (query.data.includes('select')) {
-    date = query.data === 'select1' ? '13.06.2024, 20:00' : '15.06.2024, 16:30';
-    user.date = date;
+    selectedDateString = query.data === 'select1' ? '13.06.2024, 20:00' : '15.06.2024, 16:30';
+    user.date = selectedDateString;
   }
   else {
-    date = user.date;
+    selectedDateString = user.date;
+  }
+
+  const selectedDate = new Date(selectedDateString.slice(0, 10).split('.').reverse().join('-'));
+
+  if (selectedDate < today) {
+    await bot.sendMessage(
+        query.message.chat.id,
+        "‼️Гэтая дата спектаклю больш не актуальная. Абярыце іншую", {
+          reply_markup: {
+            inline_keyboard: [[{ text: "⏪Вярнуцца", callback_data: 'clean_start' }]],
+          },
+        }
+    );
+    saveData();
+
+    return;
+  }
+
+  if (lines.every(line => line.every(place => !place[selectedDateString]))) {
+    await bot.sendMessage(
+        query.message.chat.id,
+        "На жаль, усе месцы на гэтую дату занятыя😔 \nВы можаце пачакаць і паспрабаваць зноў праз некаторы час.", {
+          reply_markup: {
+            inline_keyboard: [[{ text: "⏪Вярнуцца", callback_data: 'clean_start' }]],
+          },
+        }
+    );
+    saveData();
+
+    return;
   }
 
   const kb = lines.map((line, i) => {
-    if (line.some(place => place[date])) {
+    if (line.some(place => place[selectedDateString])) {
       return [{ text: `Рад ${i + 1}`, callback_data: "line_" + (i + 1) }];
     }
   }).filter(line => line);
@@ -302,8 +336,11 @@ ${remainingBookings != 0 ? "❗️ У вас засталося актыўных
         height: 1280
       });
     } else if (query.data === 'clean_start') {
-      await bot.deleteMessage(query.message.chat.id, query.message.message_id);
-      await bot.deleteMessage(query.message.chat.id, query.message.message_id - 1);
+      try {
+        await bot.deleteMessage(query.message.chat.id, query.message.message_id);
+        await bot.deleteMessage(query.message.chat.id, query.message.message_id - 1);
+      }
+      catch (err) {}
       await startConversation(query.message, true);
     } else if (query.data === 'start') {
       await startConversation(query.message);
