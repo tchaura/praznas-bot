@@ -125,7 +125,6 @@ const handleDateSelection = async (query, user) => {
           },
         }
     );
-    saveData();
 
     return;
   }
@@ -139,7 +138,6 @@ const handleDateSelection = async (query, user) => {
           },
         }
     );
-    saveData();
 
     return;
   }
